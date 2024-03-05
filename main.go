@@ -34,7 +34,7 @@ func calculateHash(block Block) string {
   h := sha256.New()
   h.Write([]byte(record))
   hashed := h.Sum(nil)
-  return hex.EncondeToString(hashed)
+  return hex.EncodeToString(hashed)
 }
 
 // Create a new block using previus blocks hashed
@@ -151,4 +151,20 @@ func handleConn(conn net.Conn) {
       io.WriteString(conn, "\nEnter a new BPM: ")
     }
   }()
+
+  go func() {
+    for {
+      time.Sleep(30 * time.Second)
+      output, err := json.Marshal(Blockchain)
+
+      if err != nil {
+        log.Fatal(err)
+      }
+      io.WriteString(conn, string(output))
+    }
+  }()
+
+  for _ = range bcServer {
+    spew.Dump(Blockchain)
+  }
 }
